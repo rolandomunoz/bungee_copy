@@ -1,2 +1,5 @@
-# bungee_copy
-Extrae archivos pareja de un repositorio. "La copia bungee tiene las propiedades de la goma y el caucho.
+# Bungee copy
+
+Given a list of files stored in a directory, find the files that match the same filename but with differt extension. 
+
+'Bungee Copy has the properties of both rubber and gum.'
