@@ -153,12 +153,12 @@ class Message:
 		counter = 0
 		for case_items in self.missing_cases:
 			counter+=1
-			print('ATENCIÓN [{}]: No se encuentra pareja\n'.format(counter))
+			print('WARNING [{}]: Cannot find the target file\n'.format(counter))
 			for item in case_items:
 				print('- {}'.format(item))
 
 	def print_summary(self):
-		summary_str = 'Archivos copiados:\t{}\nArchivos sin copia:\t{}\nArchivos sobrescritos:\t{}\n'.format(self.found_counter, self.missing_counter, self.overwrite_counter)
+		summary_str = 'Copied target files:     \t{}\nMissing target files:     \t{}\nOverwritten target files:\t{}\n'.format(self.found_counter, self.missing_counter, self.overwrite_counter)
 		print('--------------------Resumen--------------------')
 		print(summary_str)
 		print('-----------------------------------------------')
