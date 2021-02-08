@@ -159,7 +159,7 @@ class Message:
 
 	def print_summary(self):
 		summary_str = 'Copied target files:     \t{}\nMissing target files:     \t{}\nOverwritten target files:\t{}\n'.format(self.found_counter, self.missing_counter, self.overwrite_counter)
-		print('--------------------Resumen--------------------')
+		print('--------------------Summary--------------------')
 		print(summary_str)
 		print('-----------------------------------------------')
 
