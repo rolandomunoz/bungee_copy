@@ -107,8 +107,9 @@ def dynamic_pull_files(folder_path, file_extension, folder_path_filter, reposito
 	for folder_path, basenames in paths_by_dir.items():
 		repository_path = os.path.normpath(os.path.join(folder_path, repository_relative_path))
 		if not os.path.isdir(repository_path):
+			msg.count_missing_case(len(basenames))
 			continue
-			
+		
 		repository.scan(repository_path, search_extension)
 		for basename in basenames:
 			path = os.path.join(folder_path, basename)
@@ -131,13 +132,14 @@ def dynamic_pull_files(folder_path, file_extension, folder_path_filter, reposito
 class Message:
 
 	def __init__(self):
+		self.missing_repository_counter = 0
 		self.found_counter = 0
 		self.missing_counter = 0
 		self.overwrite_counter = 0
 		self.missing_cases =list()
 	
-	def count_missing_case(self):
-		self.missing_counter+=1
+	def count_missing_case(self, value = 1):
+		self.missing_counter+=value
 	
 	def count_found_case(self):
 		self.found_counter+=1
