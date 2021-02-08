@@ -93,4 +93,4 @@ else:
 	if not os.path.isdir(repository_path):
 		raise NameError('The repository path does not exist:\n-{}'.format(repository_path))
 	pull_files.pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension)
-print('__________________________Listo______________________')
+print('__________________________Done______________________')
