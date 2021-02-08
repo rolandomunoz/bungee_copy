@@ -70,6 +70,7 @@ class FileCollector:
 		return path_by_group
 
 def pull_files(folder_path, file_extension, folder_path_filter, repository_path, search_extension):
+	report_path = os.path.join(folder_path, 'report-missing_cases.txt')
 	msg = Message()
 	repository = Repository()
 	repository.scan(repository_path, search_extension)
@@ -80,7 +81,6 @@ def pull_files(folder_path, file_extension, folder_path_filter, repository_path,
 	for path in file_collector:
 		new_target_path = os.path.splitext(path)[0] + '.'+ search_extension		
 		target_basename = os.path.basename(new_target_path)
-		
 		try:
 			target_paths = repository.search_filename(target_basename)
 			if len(target_paths) > 1:
@@ -93,7 +93,7 @@ def pull_files(folder_path, file_extension, folder_path_filter, repository_path,
 			msg.count_missing_case()
 			msg.add_missing_item(path, target_path)
 	msg.print_summary()
-	msg.print_missing_cases()
+	msg.write_missing_cases_report(report_path)
 	
 def dynamic_pull_files(folder_path, file_extension, folder_path_filter, repository_relative_path, search_extension):
 	'''
