@@ -34,6 +34,9 @@ class FileCollector:
 	def __init__(self):
 		self.path_collection = list()
 
+	def __str__(self):
+		return str(self.path_collection)
+		
 	def __iter__(self):
 		return iter(self.path_collection)
 		
@@ -44,7 +47,6 @@ class FileCollector:
 			if path_filter == None:
 				pass
 			else:
-				print(root, fnmatch.fnmatchcase(root, path_filter))
 				if not fnmatch.fnmatchcase(root, path_filter):
 					continue
 			
@@ -97,24 +99,27 @@ def dynamic_pull_files(folder_path, file_extension, folder_path_filter, reposito
 	'''
 		The repository path is relative to each found file
 	'''
+	report_path = os.path.join(folder_path, 'report-missing_cases.txt')
+	
 	msg = Message()
 	repository = Repository()
-
+	
 	file_collector = FileCollector()
 	file_collector.get_list_of_files(folder_path, file_extension, folder_path_filter)
 	paths_by_dir = file_collector.group_by_dir()
 
 	for folder_path, basenames in paths_by_dir.items():
 		repository_path = os.path.normpath(os.path.join(folder_path, repository_relative_path))
+		
 		if not os.path.isdir(repository_path):
 			msg.count_missing_case(len(basenames))
 			continue
-		
+	
 		repository.scan(repository_path, search_extension)
 		for basename in basenames:
 			path = os.path.join(folder_path, basename)
 			new_target_path = os.path.splitext(path)[0] + '.' + search_extension
-			target_basename = os.path.basename(new_target_path)			
+			target_basename = os.path.basename(new_target_path)		
 			try:
 				target_paths = repository.search_filename(target_basename)
 				if len(target_paths) > 1:
@@ -124,10 +129,10 @@ def dynamic_pull_files(folder_path, file_extension, folder_path_filter, reposito
 					shutil.copy(target_path, new_target_path)		
 			except:
 				msg.count_missing_case()
-				msg.add_missing_item(path, target_path)
+				msg.add_missing_item(path, repository_path)
 	
 	msg.print_summary()
-	msg.print_missing_cases()
+	msg.write_missing_cases_report(report_path)
 
 class Message:
 
@@ -151,14 +156,15 @@ class Message:
 		items = [item for item in args]
 		self.missing_cases.append(items)
 
-	def print_missing_cases(self):
+	def write_missing_cases_report(self, path):
 		counter = 0
-		for case_items in self.missing_cases:
-			counter+=1
-			print('WARNING [{}]: Cannot find the target file\n'.format(counter))
-			for item in case_items:
-				print('- {}'.format(item))
-
+		with open(path, mode = 'w') as f:
+			for case_items in self.missing_cases:
+				counter+=1
+				f.write('WARNING [{}]: Cannot find the target file\n'.format(counter))
+				for item in case_items:
+					f.write('- {}\n'.format(item))
+			
 	def print_summary(self):
 		summary_str = 'Copied target files:     \t{}\nMissing target files:     \t{}\nOverwritten target files:\t{}\n'.format(self.found_counter, self.missing_counter, self.overwrite_counter)
 		print('--------------------Summary--------------------')
