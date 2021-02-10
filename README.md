@@ -12,3 +12,6 @@ On Windows:
 ```
 python.exe cli-bungee_copy.py "C:\Users\Teresa\Desktop\wav_audio" -x "wav" -X "TextGrid" -r "C:\Users\Teresa\Repository\textgrid_files"
 ```
+
+# Acknowledgment
+The icon for this tool was taken from [this website](https://icon-icons.com/icon/gum-sweets/176823) under the CC Atribution Terms.
