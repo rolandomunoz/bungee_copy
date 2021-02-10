@@ -91,7 +91,7 @@ def pull_files(folder_path, file_extension, folder_path_filter, repository_path,
 				shutil.copy(target_path, new_target_path)
 		except:
 			msg.count_missing_case()
-			msg.add_missing_item(path, target_path)
+			msg.add_missing_item(path)
 	msg.print_summary()
 	msg.write_missing_cases_report(report_path)
 	
