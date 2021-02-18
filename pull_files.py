@@ -69,7 +69,7 @@ class FileCollector:
 				path_by_group[folder_path] = [basename]
 		return path_by_group
 
-def pull_files(folder_path, file_extension, folder_path_filter, repository_path, search_extension):
+def pull_files(folder_path, file_extension, folder_path_filter, repository_path, search_extension, overwrite = False):
 	report_path = os.path.join(folder_path, 'report-missing_cases.txt')
 	msg = Message()
 	repository = Repository()
@@ -88,6 +88,9 @@ def pull_files(folder_path, file_extension, folder_path_filter, repository_path,
 
 			for target_path in target_paths:
 				msg.count_found_case()
+				if overwrite:
+					if os.path.isfile(new_target_path):
+						continue
 				shutil.copy(target_path, new_target_path)
 		except:
 			msg.count_missing_case()
