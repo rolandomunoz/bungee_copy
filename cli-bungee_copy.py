@@ -30,7 +30,7 @@ parser.add_argument('-f', '--filter-path-by', default = None, help='Select speci
 parser.add_argument('-r', '--repository-path', default = None, help = 'The folder path where target files are stored.')
 parser.add_argument('-X', '--target-extension', default = None, help='The extension of the target files.')
 parser.add_argument('-d', '--dynamic-mode', action='store_true', help='If activated, the repository path becomes relative to the origin files')
-
+parser.add_argument('-w', '--overwrite-mode', action='store_true', help='overwrite files in the origin folder')
 # Variables
 args = parser.parse_args()
 folder_path = args.folder_path
@@ -39,6 +39,7 @@ filter_path_by = args.filter_path_by
 target_extension = args.target_extension
 repository_path = args.repository_path
 dynamic_mode = args.dynamic_mode
+overwrite_mode = args.overwrite_mode
 
 # Executable path
 config = configparser.ConfigParser()
@@ -77,13 +78,14 @@ print('Origin:')
 print('  - Path:          \t', folder_path)
 print('  - Extension:     \t', file_extension)
 print('  - Filter path by:\t', filter_path_by)
+print('  - Overwrite files\t', overwrite_mode)
 print('\nRepository:')
 print('  - Path:            \t', repository_path)
 print('  - Target extension:\t', target_extension)
 print()
 
 if dynamic_mode:
-	pull_files.dynamic_pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension)
+	pull_files.dynamic_pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension, overwrite_mode)
 else:
 	if not os.path.isabs(repository_path):
 		raw_repository_path = os.path.join(folder_path, repository_path)
@@ -92,5 +94,5 @@ else:
 	# Validate directories
 	if not os.path.isdir(repository_path):
 		raise NameError('The repository path does not exist:\n-{}'.format(repository_path))
-	pull_files.pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension)
+	pull_files.pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension, overwrite_mode)
 print('__________________________Done______________________')

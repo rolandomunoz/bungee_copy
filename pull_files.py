@@ -69,7 +69,7 @@ class FileCollector:
 				path_by_group[folder_path] = [basename]
 		return path_by_group
 
-def pull_files(folder_path, file_extension, folder_path_filter, repository_path, search_extension, overwrite = False):
+def pull_files(folder_path, file_extension, folder_path_filter, repository_path, search_extension, overwrite_files = False):
 	report_path = os.path.join(folder_path, 'report-missing_cases.txt')
 	msg = Message()
 	repository = Repository()
@@ -87,18 +87,20 @@ def pull_files(folder_path, file_extension, folder_path_filter, repository_path,
 				msg.count_overwrite_case()
 
 			for target_path in target_paths:
-				msg.count_found_case()
-				if overwrite:
+				if not overwrite_files:
 					if os.path.isfile(new_target_path):
+						msg.count_skip_case()
 						continue
+						
 				shutil.copy(target_path, new_target_path)
+				msg.count_copy_case()
 		except:
 			msg.count_missing_case()
 			msg.add_missing_item(path)
 	msg.print_summary()
 	msg.write_missing_cases_report(report_path)
 	
-def dynamic_pull_files(folder_path, file_extension, folder_path_filter, repository_relative_path, search_extension):
+def dynamic_pull_files(folder_path, file_extension, folder_path_filter, repository_relative_path, search_extension, overwrite_files = False):
 	'''
 		The repository path is relative to each found file
 	'''
@@ -128,8 +130,13 @@ def dynamic_pull_files(folder_path, file_extension, folder_path_filter, reposito
 				if len(target_paths) > 1:
 					msg.count_overwrite_case()
 				for target_path in target_paths:
-					msg.count_found_case()
-					shutil.copy(target_path, new_target_path)		
+					if not overwrite_files:
+						if os.path.isfile(new_target_path):
+							msg.count_skip_case()
+							
+							continue
+					shutil.copy(target_path, new_target_path)
+					msg.count_copy_case()
 			except:
 				msg.count_missing_case()
 				msg.add_missing_item(path, repository_path)
@@ -144,12 +151,16 @@ class Message:
 		self.found_counter = 0
 		self.missing_counter = 0
 		self.overwrite_counter = 0
+		self.count_skip_copy = 0
 		self.missing_cases =list()
-	
+		
+	def count_skip_case(self):
+		self.count_skip_copy+=1
+
 	def count_missing_case(self, value = 1):
 		self.missing_counter+=value
 	
-	def count_found_case(self):
+	def count_copy_case(self):
 		self.found_counter+=1
 
 	def count_overwrite_case(self):
@@ -169,7 +180,7 @@ class Message:
 					f.write('- {}\n'.format(item))
 			
 	def print_summary(self):
-		summary_str = 'Copied target files:     \t{}\nMissing target files:     \t{}\nOverwritten target files:\t{}\n'.format(self.found_counter, self.missing_counter, self.overwrite_counter)
+		summary_str = 'Copies done:              \t{}\nSkipped copies:          \t{}\nMissing targets:        \t{}\nMany-to-one targets:    \t{}\n'.format(self.found_counter, self.count_skip_copy, self.missing_counter, self.overwrite_counter)
 		print('--------------------Summary--------------------')
 		print(summary_str)
 		print('-----------------------------------------------')
