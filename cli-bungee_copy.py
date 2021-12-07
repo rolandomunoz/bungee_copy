@@ -22,9 +22,9 @@ parser = argparse.ArgumentParser(
     prog = 'Bungee copy',
     description= (
     'Given a list of files stored in a directory,'
-    'find the files that match the same filename but with'
-    ' differt extension.\n"Bungee Copy has the properties'
-    'of both rubber and gum."'
+    ' find the files that match the same filename but with'
+    ' different extension.\n"BungeeCopy has the properties'
+    ' of both rubber and gum."'
     ),
     epilog = 'Written by Rolando Muñoz Aramburú (Feb-2021)',
     formatter_class = argparse.RawTextHelpFormatter
