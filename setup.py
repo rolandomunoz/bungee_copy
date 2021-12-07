@@ -16,4 +16,4 @@ setup(name = 'BungeeCopy',
   version = "1.0",
   description = 'Copy files',
   options = {'build_exe': build_exe_options, 'bdist_msi': {}},
-  executables = [Executable('cli-bungee_copy.py', base=base, targetName ='BungeeCopy', icon='bungee_copy.ico')])
+  executables = [Executable('cli-bungee_copy.py', base=base, target_name ='BungeeCopy', icon='bungee_copy.ico')])
