@@ -1,0 +1,3 @@
+file_extension = "wav"
+repository_path = "..\repository"
+target_extension = "wav.SHA256"
