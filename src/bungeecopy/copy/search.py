@@ -24,7 +24,7 @@ def search_filepairs(src_dir, recursive, extension, new_extensions, search_dir):
             continue
         dict_[base_path] = None
         for new_extension in new_extensions:
-            new_filename = base_path.with_suffix(new_extension).name                
+            new_filename = base_path.with_suffix(new_extension).name
             match = find_file(new_filename, search_dir, True)
             if match is None:
                 continue
@@ -32,7 +32,7 @@ def search_filepairs(src_dir, recursive, extension, new_extensions, search_dir):
                 new_extension: match
             }
     return dict_
-            
+
 def find_file(filename, root_dir, recursive):
     """
     Report all the occurrences of a filename in a directory.
