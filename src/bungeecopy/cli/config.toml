@@ -1,3 +1,6 @@
-file_extension = "wav"
-repository_path = "..\repository"
-target_extension = "wav.SHA256"
+dir_in = "C:/Users/lab/Desktop/temp/Oficio N° 966-2022/datos"
+file_extension = ".wav"
+target_extension = ".TextGrid"
+repository_dir = "C:/Users/lab/OneDrive/Documents/OPERIT/casos-transcripción/trn_021/scripts/.data/transcription-repository"
+dynamic_mode = false
+overwrite_mode = false

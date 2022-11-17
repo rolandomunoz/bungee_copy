@@ -1,7 +1,8 @@
 import argparse
 from pathlib import Path
+from importlib.resources import files
 import tomlkit
-import pull_files
+from bungeecopy.copy import pull_files
 
 LOGO = '''
 
@@ -23,17 +24,19 @@ def cli():
     )
 
     # Parser
-    parser.add_argument('folder_path', help='Origin folder', type = Path)
-    parser.add_argument('-x', '--file-extension', type = str,
+    src_group = parser.add_argument_group('Source', 'Source parameters')
+    parser.add_argument('source_dir', type = Path, help='Origin folder')
+    src_group.add_argument('-x', '--file-extension', type = str,
         help='origin extension'
     )
-    parser.add_argument('-f', '--filter-path-by', type = str,
+    src_group.add_argument('-f', '--filter-path-by', type = str,
         help='select specific path names using wild cards'
     )
-    parser.add_argument('-r', '--repository-path', type = Path,
+    repo_group = parser.add_argument_group('Target', 'Target parameters')
+    repo_group.add_argument('-r', '--repository-dir', type = Path,
         help = 'the folder path where target files are stored'
     )
-    parser.add_argument('-X', '--target-extension', type = str,
+    repo_group.add_argument('-X', '--target-extension', type = str,
         help='the extension of the target files.'
     )
     parser.add_argument('-d', '--dynamic-mode', action='store_true',
@@ -44,67 +47,60 @@ def cli():
     )
 
     # Verify
-    namespace = parser.parse_namespace()
-    print(namespace)
-    exit()
-    #namespace.folder_path
-    #namespace.file_extension
-    #namespace.filter_path_by
-    #namespace.target_extension
-    #namespace.repository_path
-    #namespace.dynamic_mode
-    #namespace.overwrite_mode
+    config_path = files('bungeecopy.cli').joinpath('config.toml')
+    config = tomlkit.parse(
+        config_path.read_text('utf-8')
+    )
+    namespace = parser.parse_args()
 
-# Executable path
+    if namespace.file_extension is None:
+        namespace.file_extension = config['file_extension']
 
-save = False
-if file_extension is None:
-    file_extension = config['General']['file_extension']
-else:
-    config['General']['file_extension'] = file_extension
-    save = True
+    if namespace.target_extension is None:
+        namespace.target_extension = config['target_extension']
 
-if target_extension is None:
-    target_extension = config['General']['target_extension']
-else:
-    config['General']['target_extension'] = target_extension
-    save = True
+    if namespace.repository_dir is None:
+        namespace.repository_dir = Path(config['repository_dir'])
 
-if repository_path is None:
-    repository_path = config['General']['repository_path']
-else:
-    config['General']['repository_path'] = repository_path
-    save = True
-
-if save:
-    with open(config_file, 'w', encoding = 'utf-8') as configfile:
-        config.write(configfile)
-
-if not os.path.isdir(folder_path):
-    raise NameError(f'Origin folder does not exist:\n-{folder_path}')
-
-print('-----------------Copia bungee-----------------')
-print('')
-print('Mode:\t{}\n'.format('Dynamic repository' if dynamic_mode else 'Fixed repository'))
-print('Origin:')
-print('  - Path:          \t', folder_path)
-print('  - Extension:     \t', file_extension)
-print('  - Filter path by:\t', filter_path_by)
-print('  - Overwrite files\t', overwrite_mode)
-print('\nRepository:')
-print('  - Path:            \t', repository_path)
-print('  - Target extension:\t', target_extension)
-print()
-
-if dynamic_mode:
-    pull_files.dynamic_pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension, overwrite_mode)
-else:
-    if not os.path.isabs(repository_path):
-        raw_repository_path = os.path.join(folder_path, repository_path)
-        repository_path = os.path.normpath(raw_repository_path)
-
-    # Validate directories
-    if not os.path.isdir(repository_path):
-        raise NameError(f'The repository path does not exist:\n-{repository_path}')
-    pull_files.pull_files(folder_path, file_extension, filter_path_by, repository_path, target_extension, overwrite_mode)
-print('__________________________Done______________________')
+    dict_ = {
+            'dir_in': namespace.source_dir.as_posix(),
+            'file_extension': namespace.file_extension,
+            #'filter_path_by': namespace.filter_path_by,
+            'target_extension': namespace.target_extension,
+            'repository_dir': namespace.repository_dir.as_posix(),
+            'dynamic_mode': namespace.dynamic_mode,
+            'overwrite_mode': namespace.overwrite_mode,
+    }
+    config_out_str = tomlkit.dumps(dict_)
+    config_path.write_text(config_out_str, encoding = 'utf-8')
+    info = f'''
+    -----------------Bunee Copy-----------------
+    Origin:
+        - Path:                 {namespace.source_dir}
+        - Extension:            {namespace.file_extension}
+        - Filter path by:       {namespace.filter_path_by}
+        - Overwrite files       {namespace.overwrite_mode}
+    Repository:
+        - Path:                 {namespace.repository_dir}
+        - Target extension:     {namespace.target_extension}
+    '''
+    print(info)
+    if namespace.dynamic_mode:
+        pull_files.dynamic_pull_files(
+            namespace.source_dir,
+            namespace.file_extension,
+            namespace.filter_path_by,
+            namespace.repository_dir,
+            namespace.target_extension,
+            namespace.overwrite_mode
+        )
+    else:
+        pull_files.pull_files(
+            namespace.source_dir,
+            namespace.file_extension,
+            namespace.filter_path_by,
+            namespace.repository_dir,
+            namespace.target_extension,
+            namespace.overwrite_mode
+        )
+    print('__________________________Done______________________')
